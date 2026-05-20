@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin — Scacchi dei Pinci</title>
+<style>
+  :root {
+    --bg:     #0d0c0b;
+    --bg2:    #161412;
+    --bg3:    #1e1b18;
+    --border: rgba(255,255,255,0.08);
+    --border2:rgba(255,255,255,0.16);
+    --text1:  #e8e4dc;
+    --text2:  #a09890;
+    --text3:  #5a534e;
+    --gold:   #d4a843;
+    --goldbg: rgba(212,168,67,0.10);
+    --red:    #e05555;
+    --redbg:  rgba(224,85,85,0.10);
+    --green:  #5dca8a;
+    --greenbg:rgba(93,202,138,0.10);
+    --radius: 8px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text1); font-family: 'Georgia', serif; min-height: 100vh; }
+
+  /* ── LOGIN ── */
+  #login-screen {
+    min-height: 100vh; display: flex; align-items: center; justify-content: center;
+  }
+  .login-box {
+    background: var(--bg2); border: 1px solid var(--border2); border-radius: 12px;
+    padding: 40px 36px; width: 340px; text-align: center;
+  }
+  .login-box h1 { font-size: 22px; color: var(--gold); margin-bottom: 6px; letter-spacing: 0.04em; }
+  .login-box p  { font-size: 13px; color: var(--text2); margin-bottom: 28px; }
+  .login-box input {
+    width: 100%; padding: 10px 12px; border-radius: var(--radius);
+    background: var(--bg3); border: 1px solid var(--border2); color: var(--text1);
+    font-size: 14px; margin-bottom: 10px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .login-box input:focus { border-color: var(--gold); }
+  .btn-gold {
+    width: 100%; padding: 11px; border-radius: var(--radius);
+    background: var(--goldbg); border: 1px solid var(--gold);
+    color: var(--gold); font-size: 14px; font-weight: bold;
+    cursor: pointer; letter-spacing: 0.05em; transition: background 0.15s;
+  }
+  .btn-gold:hover { background: rgba(212,168,67,0.2); }
+  .login-err { color: var(--red); font-size: 12px; margin-top: 10px; min-height: 18px; }
+
+  /* ── ADMIN SHELL ── */
+  #admin-screen { display: none; }
+  .admin-topbar {
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    padding: 12px 24px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .admin-topbar-title { font-size: 16px; font-weight: bold; color: var(--gold); letter-spacing: 0.05em; }
+  .admin-topbar-user  { font-size: 13px; color: var(--text2); display: flex; align-items: center; gap: 12px; }
+  .btn-sm {
+    padding: 5px 12px; border-radius: 5px; font-size: 12px; cursor: pointer;
+    border: 1px solid var(--border2); background: transparent; color: var(--text2);
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-sm:hover { border-color: var(--text1); color: var(--text1); }
+  .btn-sm.danger { border-color: var(--red); color: var(--red); }
+  .btn-sm.danger:hover { background: var(--redbg); }
+  .btn-sm.success { border-color: var(--green); color: var(--green); }
+  .btn-sm.success:hover { background: var(--greenbg); }
+
+  .admin-nav {
+    background: var(--bg2); border-bottom: 1px solid var(--border);
+    display: flex; padding: 0 24px; gap: 0;
+  }
+  .nav-tab {
+    padding: 12px 20px; font-size: 13px; color: var(--text2); cursor: pointer;
+    border-bottom: 2px solid transparent; transition: color 0.15s, border-color 0.15s;
+    letter-spacing: 0.05em;
+  }
+  .nav-tab:hover  { color: var(--text1); }
+  .nav-tab.active { color: var(--gold); border-bottom-color: var(--gold); }
+
+  .admin-content { padding: 28px 32px; max-width: 1100px; }
+
+  .panel { display: none; }
+  .panel.active { display: block; }
+
+  .section-title {
+    font-size: 11px; font-weight: bold; letter-spacing: 0.12em;
+    color: var(--text3); text-transform: uppercase; margin-bottom: 16px;
+    padding-bottom: 8px; border-bottom: 1px solid var(--border);
+  }
+
+  /* ── PIECES TABLE ── */
+  .pieces-toolbar { display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px; }
+  .pieces-search {
+    padding: 8px 12px; border-radius: var(--radius);
+    background: var(--bg2); border: 1px solid var(--border2); color: var(--text1);
+    font-size: 13px; width: 220px; outline: none;
+  }
+  .pieces-search:focus { border-color: var(--gold); }
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    text-align: left; padding: 8px 10px; font-size: 10px; letter-spacing: 0.1em;
+    color: var(--text3); text-transform: uppercase; border-bottom: 1px solid var(--border);
+    position: sticky; top: 0; background: var(--bg);
+  }
+  td { padding: 7px 10px; font-size: 13px; border-bottom: 1px solid var(--border); vertical-align: middle; }
+  tr:hover td { background: var(--bg2); }
+  .td-num {
+    width: 60px; text-align: center;
+  }
+  .num-input {
+    width: 52px; padding: 4px 6px; border-radius: 5px; text-align: center;
+    background: var(--bg3); border: 1px solid var(--border2); color: var(--text1);
+    font-size: 13px; outline: none;
+  }
+  .num-input:focus { border-color: var(--gold); }
+  .rarity-badge {
+    display: inline-block; padding: 2px 8px; border-radius: 4px;
+    font-size: 10px; font-weight: bold; letter-spacing: 0.05em;
+  }
+  .rb-l { background: rgba(212,168,67,0.15); color: #d4a843; border: 1px solid rgba(212,168,67,0.3); }
+  .rb-e { background: rgba(160,100,220,0.15); color: #c080ff; border: 1px solid rgba(160,100,220,0.3); }
+  .rb-r { background: rgba(74,158,255,0.15); color: #4a9eff; border: 1px solid rgba(74,158,255,0.3); }
+  .rb-c { background: rgba(160,150,140,0.15); color: #a0968c; border: 1px solid rgba(160,150,140,0.3); }
+  .tier-select {
+    padding: 4px 8px; border-radius: 5px; background: var(--bg3);
+    border: 1px solid var(--border2); color: var(--text1); font-size: 12px; outline: none;
+    cursor: pointer;
+  }
+  .save-bar {
+    position: sticky; bottom: 0; background: var(--bg2); border-top: 1px solid var(--border2);
+    padding: 12px 32px; display: flex; align-items: center; justify-content: space-between;
+    margin: 0 -32px;
+  }
+  .save-msg { font-size: 13px; color: var(--text2); }
+  .save-msg.ok  { color: var(--green); }
+  .save-msg.err { color: var(--red); }
+
+  /* ── SETTINGS ── */
+  .settings-grid { display: grid; gap: 24px; max-width: 560px; }
+  .weights-grid { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; }
+  .weight-card {
+    background: var(--bg2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 12px 14px;
+  }
+  .weight-card-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+  .weight-val { font-size: 20px; font-weight: bold; color: var(--gold); }
+  .weight-desc { font-size: 11px; color: var(--text3); margin-top: 5px; }
+  .setting-row { display: flex; flex-direction: column; gap: 8px; }
+  .setting-label { font-size: 12px; color: var(--text2); letter-spacing: 0.05em; }
+  .setting-value { font-size: 28px; font-weight: bold; color: var(--gold); }
+  input[type=range] {
+    width: 100%; accent-color: var(--gold); cursor: pointer;
+  }
+
+  /* ── ADMINS ── */
+  .admins-list { display: flex; flex-direction: column; gap: 8px; margin-bottom: 20px; }
+  .admin-row {
+    display: flex; align-items: center; justify-content: space-between;
+    background: var(--bg2); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 10px 14px;
+  }
+  .admin-email { font-size: 14px; }
+  .admin-tag { font-size: 10px; color: var(--text3); margin-left: 8px; }
+  .add-admin-row { display: flex; gap: 10px; }
+  .add-admin-input {
+    flex: 1; padding: 9px 12px; border-radius: var(--radius);
+    background: var(--bg2); border: 1px solid var(--border2); color: var(--text1);
+    font-size: 14px; outline: none;
+  }
+  .add-admin-input:focus { border-color: var(--gold); }
+
+  .spinner {
+    border: 2px solid var(--border2); border-top-color: var(--gold);
+    border-radius: 50%; width: 20px; height: 20px;
+    animation: spin 0.7s linear infinite;
+    display: inline-block; margin: 40px auto; display: block;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<!-- LOGIN -->
+<div id="login-screen">
+  <div class="login-box">
+    <h1>⚙ Admin Panel</h1>
+    <p>Scacchi dei Pinci — Console di amministrazione</p>
+    <input type="email" id="adm-email" placeholder="Email amministratore" autocomplete="email">
+    <input type="password" id="adm-pass" placeholder="Password" autocomplete="current-password">
+    <button class="btn-gold" onclick="adminLogin()">Accedi</button>
+    <div class="login-err" id="adm-err"></div>
+  </div>
+</div>
+
+<!-- ADMIN SHELL -->
+<div id="admin-screen">
+  <div class="admin-topbar">
+    <span class="admin-topbar-title">⚙ Scacchi dei Pinci — Admin</span>
+    <div class="admin-topbar-user">
+      <span id="adm-user-label"></span>
+      <button class="btn-sm" onclick="adminLogout()">Esci</button>
+    </div>
+  </div>
+  <div class="admin-nav">
+    <div class="nav-tab active" id="tab-pieces"  onclick="switchTab('pieces')">Carte</div>
+    <div class="nav-tab"        id="tab-settings" onclick="switchTab('settings')">Impostazioni</div>
+    <div class="nav-tab"        id="tab-admins"   onclick="switchTab('admins')">Amministratori</div>
+  </div>
+
+  <div class="admin-content">
+
+    <!-- PANEL: CARTE -->
+    <div class="panel active" id="panel-pieces">
+      <div class="section-title">Gestione carte</div>
+      <div class="pieces-toolbar">
+        <input class="pieces-search" id="pieces-search" placeholder="Cerca carta…" oninput="filterPieces(this.value)">
+        <button class="btn-sm success" onclick="savePieces()">Salva modifiche</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th style="width:200px">Nome</th>
+            <th class="td-num">C</th>
+            <th class="td-num">R</th>
+            <th class="td-num">V</th>
+            <th class="td-num">Forza</th>
+            <th>Rarità</th>
+          </tr>
+        </thead>
+        <tbody id="pieces-tbody"></tbody>
+      </table>
+      <div class="save-bar">
+        <span class="save-msg" id="pieces-msg"></span>
+        <button class="btn-sm success" onclick="savePieces()">Salva modifiche</button>
+      </div>
+    </div>
+
+    <!-- PANEL: IMPOSTAZIONI -->
+    <div class="panel" id="panel-settings">
+      <div class="section-title">Impostazioni di gioco</div>
+      <div class="settings-grid">
+        <div class="setting-row">
+          <div class="setting-label">PUNTEGGIO VITTORIA</div>
+          <div class="setting-value" id="win-val-adm">50</div>
+          <input type="range" id="win-slider-adm" min="10" max="200" step="5" value="50"
+                 oninput="document.getElementById('win-val-adm').textContent=this.value">
+          <div style="font-size:12px;color:var(--text3)">Min 10 · Max 200 · Step 5</div>
+        </div>
+
+        <div>
+          <div class="section-title" style="margin-top:4px">Pesi per rarità</div>
+          <div style="font-size:12px;color:var(--text3);margin-bottom:14px">
+            Peso più alto = più probabilità che una carta di quella rarità appaia nel basket
+          </div>
+          <div class="weights-grid" id="weights-grid"></div>
+        </div>
+
+        <button class="btn-sm success" style="width:160px" onclick="saveSettings()">Salva impostazioni</button>
+        <div class="save-msg" id="settings-msg"></div>
+      </div>
+    </div>
+
+    <!-- PANEL: AMMINISTRATORI -->
+    <div class="panel" id="panel-admins">
+      <div class="section-title">Lista amministratori</div>
+      <div class="admins-list" id="admins-list">
+        <div class="spinner"></div>
+      </div>
+      <div class="add-admin-row">
+        <input class="add-admin-input" id="new-admin-email" placeholder="Nuova email amministratore"
+               onkeydown="if(event.key==='Enter') addAdmin()">
+        <button class="btn-sm success" onclick="addAdmin()">Aggiungi</button>
+      </div>
+      <div class="save-msg" id="admins-msg" style="margin-top:10px"></div>
+    </div>
+
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp }  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged, signOut }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js';
+import { getDatabase, ref, get, set, remove, onValue }
+  from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js';
+
+const firebaseConfig = {
+  apiKey:            "AIzaSyBBojqNJEJ935iiXiqcmshI0hNS1iD3dow",
+  authDomain:        "scacchideipincimp.firebaseapp.com",
+  projectId:         "scacchideipincimp",
+  storageBucket:     "scacchideipincimp.firebasestorage.app",
+  messagingSenderId: "887139659354",
+  appId:             "1:887139659354:web:630ab968b99e04495d3263",
+  databaseURL:       "https://scacchideipincimp-default-rtdb.europe-west1.firebasedatabase.app"
+};
+
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getDatabase(app);
+
+const SUPER_ADMIN = 'grandepinna.tk@gmail.com';
+
+// ── Default pieces (fallback se Firebase non ha override) ────────────────────
+const DEFAULT_PIECES = [
+  {name:"Spalacacca",z:[1,1,2],val:20},{name:"Sentinella Sicula",z:[3,2,1],val:15},
+  {name:"U Porco",z:[2,0,2],val:15},{name:"Jullare",z:[3,3,1],val:15},
+  {name:"L'impiccato",z:[1,2,2],val:15},{name:"Scavafossati",z:[2,1,1],val:20},
+  {name:"Genuflesso",z:[1,3,1],val:15},{name:"Imboscato",z:[2,2,2],val:12},
+  {name:"Srotolatappeti",z:[2,2,1],val:12},{name:"Illetterato",z:[1,1,2],val:10},
+  {name:"Accenditorce",z:[2,1,1],val:12},{name:"Mangiapane",z:[1,1,2],val:10},
+  {name:"Catapulta Umana",z:[2,1,2],val:8},{name:"Lebbroso",z:[0,0,3],val:8},
+  {name:"Calpestato",z:[2,1,1],val:10},{name:"Raccoglifrecce",z:[2,2,1],val:15},
+  {name:"Gattara",z:[1,1,2],val:10},{name:"Esattore",z:[2,3,1],val:7},
+  {name:"Reggitrono",z:[2,4,0],val:4},{name:"Sventolatore",z:[2,3,1],val:7},
+  {name:"Ratto di Fogna",z:[1,1,2],val:15},{name:"Spaventapasseri",z:[1,1,2],val:10},
+  {name:"Bevipozioni",z:[2,1,1],val:10},{name:"Portaspade",z:[2,2,1],val:10},
+  {name:"Suonacampane",z:[1,2,2],val:8},{name:"Alzaponte",z:[2,1,1],val:8},
+  {name:"Fagiano di corte",z:[1,3,0],val:8},{name:"Vendistracci",z:[1,0,3],val:15},
+  {name:"Guaritore Cieco",z:[3,3,3],val:5},{name:"Boia Tagliateste",z:[2,2,2],val:8},
+  {name:"Cellaio",z:[2,1,1],val:8},{name:"Arciere gobbo",z:[3,1,1],val:15},
+  {name:"Spadaccino monco",z:[3,1,1],val:15},{name:"Frate Ubriaco",z:[2,2,2],val:8},
+  {name:"Monaco Obeso",z:[2,3,1],val:7},{name:"Apparecchiatavoli",z:[2,2,0],val:10},
+  {name:"Mangiapeccati",z:[1,0,3],val:8},{name:"Seppellianimali",z:[1,1,3],val:8},
+  {name:"Usuraio",z:[1,0,4],val:5},{name:"Portaneve",z:[1,1,3],val:8}
+];
+
+function tierOf(val) {
+  if (val >= 20) return 'l';
+  if (val >= 15) return 'e';
+  if (val >= 10) return 'r';
+  return 'c';
+}
+function tierLabel(t) {
+  return {l:'Leggendario',e:'Epico',r:'Raro',c:'Comune'}[t];
+}
+function tierCls(t) {
+  return {l:'rb-l',e:'rb-e',r:'rb-r',c:'rb-c'}[t];
+}
+
+let pieces   = [];
+let settings = { winPts: 50 };
+let admins   = [];
+let currentUser = null;
+
+// ── Auth ─────────────────────────────────────────────────────────────────────
+window.adminLogin = async () => {
+  const email = document.getElementById('adm-email').value.trim();
+  const pass  = document.getElementById('adm-pass').value;
+  const errEl = document.getElementById('adm-err');
+  errEl.textContent = '';
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+  } catch(e) {
+    errEl.textContent = 'Credenziali non valide.';
+  }
+};
+
+window.adminLogout = () => signOut(auth);
+
+document.getElementById('adm-pass').addEventListener('keydown', e => {
+  if (e.key === 'Enter') window.adminLogin();
+});
+
+onAuthStateChanged(auth, async user => {
+  if (!user) {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('admin-screen').style.display = 'none';
+    return;
+  }
+  // Check admin role
+  const isAdmin = await checkAdmin(user.email);
+  if (!isAdmin) {
+    document.getElementById('adm-err').textContent = 'Accesso non autorizzato.';
+    await signOut(auth);
+    return;
+  }
+  currentUser = user;
+  document.getElementById('login-screen').style.display = 'none';
+  document.getElementById('admin-screen').style.display = 'block';
+  document.getElementById('adm-user-label').textContent = user.email;
+  loadAll();
+});
+
+async function checkAdmin(email) {
+  if (email === SUPER_ADMIN) return true;
+  const snap = await get(ref(db, 'admin/admins'));
+  if (!snap.exists()) return false;
+  const list = snap.val();
+  return Object.values(list).some(v => v === email);
+}
+
+// ── Load all data ─────────────────────────────────────────────────────────────
+async function loadAll() {
+  await Promise.all([loadPieces(), loadSettings(), loadAdmins()]);
+}
+
+async function loadPieces() {
+  const snap = await get(ref(db, 'admin/pieces'));
+  pieces = snap.exists() ? Object.values(snap.val()) : JSON.parse(JSON.stringify(DEFAULT_PIECES));
+  renderPiecesTable(pieces);
+}
+
+const DEFAULT_WEIGHTS = { l:1, e:3, r:6, c:12 };
+const TIER_META = [
+  { id:'l', label:'Leggendario', cls:'rb-l', desc:'val ≥ 20' },
+  { id:'e', label:'Epico',       cls:'rb-e', desc:'val 15–19' },
+  { id:'r', label:'Raro',        cls:'rb-r', desc:'val 10–14' },
+  { id:'c', label:'Comune',      cls:'rb-c', desc:'val < 10'  },
+];
+
+async function loadSettings() {
+  const snap = await get(ref(db, 'admin/settings'));
+  if (snap.exists()) settings = snap.val();
+  if (!settings.weights) settings.weights = { ...DEFAULT_WEIGHTS };
+  document.getElementById('win-slider-adm').value = settings.winPts;
+  document.getElementById('win-val-adm').textContent = settings.winPts;
+  renderWeights();
+}
+
+function renderWeights() {
+  const grid = document.getElementById('weights-grid');
+  grid.innerHTML = '';
+  TIER_META.forEach(t => {
+    const w = settings.weights[t.id] ?? DEFAULT_WEIGHTS[t.id];
+    const card = document.createElement('div');
+    card.className = 'weight-card';
+    card.innerHTML = `
+      <div class="weight-card-header">
+        <span class="rarity-badge ${t.cls}">${t.label}</span>
+        <span class="weight-val" id="wval-${t.id}">${w}</span>
+      </div>
+      <input type="range" min="0" max="30" step="1" value="${w}" id="wslider-${t.id}"
+             style="width:100%;accent-color:var(--gold)"
+             oninput="document.getElementById('wval-${t.id}').textContent=this.value">
+      <div class="weight-desc">${t.desc} &nbsp;·&nbsp; default: ${DEFAULT_WEIGHTS[t.id]}</div>`;
+    grid.appendChild(card);
+  });
+}
+
+async function loadAdmins() {
+  const snap = await get(ref(db, 'admin/admins'));
+  admins = snap.exists() ? Object.values(snap.val()) : [];
+  renderAdmins();
+}
+
+// ── Pieces ────────────────────────────────────────────────────────────────────
+function renderPiecesTable(list) {
+  const tbody = document.getElementById('pieces-tbody');
+  tbody.innerHTML = '';
+  list.forEach((p, i) => {
+    const tier = tierOf(p.val);
+    const row = document.createElement('tr');
+    row.dataset.idx = i;
+    row.innerHTML = `
+      <td style="font-weight:bold">${p.name}</td>
+      <td class="td-num"><input class="num-input" type="number" min="0" max="9" value="${p.z[0]}" data-field="z0" data-name="${p.name}"></td>
+      <td class="td-num"><input class="num-input" type="number" min="0" max="9" value="${p.z[1]}" data-field="z1" data-name="${p.name}"></td>
+      <td class="td-num"><input class="num-input" type="number" min="0" max="9" value="${p.z[2]}" data-field="z2" data-name="${p.name}"></td>
+      <td class="td-num"><input class="num-input" type="number" min="1" max="30" value="${p.val}" data-field="val" data-name="${p.name}" oninput="updateRarityBadge(this)"></td>
+      <td>
+        <span class="rarity-badge ${tierCls(tier)}" id="badge-${p.name.replace(/[^a-z]/gi,'')}">${tierLabel(tier)}</span>
+        <span style="font-size:10px;color:var(--text3);margin-left:6px">val ${p.val}</span>
+      </td>`;
+    tbody.appendChild(row);
+  });
+}
+
+window.filterPieces = (q) => {
+  const rows = document.querySelectorAll('#pieces-tbody tr');
+  rows.forEach(r => {
+    const name = r.querySelector('td').textContent.toLowerCase();
+    r.style.display = name.includes(q.toLowerCase()) ? '' : 'none';
+  });
+};
+
+window.updateRarityBadge = (input) => {
+  const name = input.dataset.name;
+  const badgeId = 'badge-' + name.replace(/[^a-z]/gi,'');
+  const badge = document.getElementById(badgeId);
+  if (!badge) return;
+  const val  = parseInt(input.value) || 0;
+  const tier = tierOf(val);
+  badge.textContent = tierLabel(tier);
+  badge.className = 'rarity-badge ' + tierCls(tier);
+  // Update val display
+  badge.nextElementSibling.textContent = `val ${val}`;
+};
+
+window.savePieces = async () => {
+  const msg = document.getElementById('pieces-msg');
+  msg.textContent = 'Salvataggio…'; msg.className = 'save-msg';
+  try {
+    const rows = document.querySelectorAll('#pieces-tbody tr');
+    const updated = pieces.map((p, i) => {
+      const row = document.querySelector(`#pieces-tbody tr[data-idx="${i}"]`);
+      if (!row) return p;
+      const inputs = row.querySelectorAll('.num-input');
+      return {
+        ...p,
+        z:   [parseInt(inputs[0].value)||0, parseInt(inputs[1].value)||0, parseInt(inputs[2].value)||0],
+        val: parseInt(inputs[3].value) || p.val,
+      };
+    });
+    const obj = {};
+    updated.forEach((p, i) => { obj[i] = p; });
+    await set(ref(db, 'admin/pieces'), obj);
+    pieces = updated;
+    msg.textContent = '✓ Salvato con successo'; msg.className = 'save-msg ok';
+    setTimeout(() => { msg.textContent = ''; }, 3000);
+  } catch(e) {
+    msg.textContent = '✗ Errore: ' + e.message; msg.className = 'save-msg err';
+  }
+};
+
+// ── Settings ──────────────────────────────────────────────────────────────────
+window.saveSettings = async () => {
+  const msg = document.getElementById('settings-msg');
+  try {
+    const winPts  = parseInt(document.getElementById('win-slider-adm').value);
+    const weights = {};
+    ['l','e','r','c'].forEach(id => {
+      weights[id] = parseInt(document.getElementById('wslider-' + id)?.value) || 0;
+    });
+    await set(ref(db, 'admin/settings'), { winPts, weights });
+    settings.winPts  = winPts;
+    settings.weights = weights;
+    msg.textContent = '✓ Salvato'; msg.className = 'save-msg ok';
+    setTimeout(() => { msg.textContent = ''; }, 3000);
+  } catch(e) {
+    msg.textContent = '✗ ' + e.message; msg.className = 'save-msg err';
+  }
+};
+
+// ── Admins ────────────────────────────────────────────────────────────────────
+function renderAdmins() {
+  const el = document.getElementById('admins-list');
+  el.innerHTML = '';
+  // Super admin (non rimovibile)
+  const superRow = document.createElement('div');
+  superRow.className = 'admin-row';
+  superRow.innerHTML = `<span class="admin-email">${SUPER_ADMIN} <span class="admin-tag">SUPER ADMIN</span></span>`;
+  el.appendChild(superRow);
+  // Other admins
+  admins.forEach((email, i) => {
+    const row = document.createElement('div');
+    row.className = 'admin-row';
+    row.innerHTML = `
+      <span class="admin-email">${email}</span>
+      <button class="btn-sm danger" onclick="removeAdmin(${i})">Rimuovi</button>`;
+    el.appendChild(row);
+  });
+}
+
+window.addAdmin = async () => {
+  const input = document.getElementById('new-admin-email');
+  const msg   = document.getElementById('admins-msg');
+  const email = input.value.trim().toLowerCase();
+  if (!email || !email.includes('@')) {
+    msg.textContent = 'Email non valida.'; msg.className = 'save-msg err'; return;
+  }
+  if (email === SUPER_ADMIN || admins.includes(email)) {
+    msg.textContent = 'Email già presente.'; msg.className = 'save-msg err'; return;
+  }
+  try {
+    admins.push(email);
+    const obj = {};
+    admins.forEach((e, i) => { obj[i] = e; });
+    await set(ref(db, 'admin/admins'), obj);
+    input.value = '';
+    renderAdmins();
+    msg.textContent = '✓ Amministratore aggiunto'; msg.className = 'save-msg ok';
+    setTimeout(() => { msg.textContent = ''; }, 3000);
+  } catch(e) {
+    admins.pop();
+    msg.textContent = '✗ ' + e.message; msg.className = 'save-msg err';
+  }
+};
+
+window.removeAdmin = async (i) => {
+  const msg = document.getElementById('admins-msg');
+  if (!confirm(`Rimuovere ${admins[i]}?`)) return;
+  try {
+    admins.splice(i, 1);
+    const obj = {};
+    admins.forEach((e, idx) => { obj[idx] = e; });
+    await set(ref(db, 'admin/admins'), obj);
+    renderAdmins();
+    msg.textContent = '✓ Rimosso'; msg.className = 'save-msg ok';
+    setTimeout(() => { msg.textContent = ''; }, 3000);
+  } catch(e) {
+    msg.textContent = '✗ ' + e.message; msg.className = 'save-msg err';
+  }
+};
+
+// ── Tab navigation ────────────────────────────────────────────────────────────
+window.switchTab = (tab) => {
+  ['pieces','settings','admins'].forEach(t => {
+    document.getElementById('tab-' + t).classList.toggle('active', t === tab);
+    document.getElementById('panel-' + t).classList.toggle('active', t === tab);
+  });
+};
+</script>
+</body>
+</html>
