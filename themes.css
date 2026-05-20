@@ -1,0 +1,318 @@
+/* ═══════════════════════════════════════════════════════════════════════════
+   SISTEMA TEMI — Scacchi dei Pinci
+   Applicato tramite attributo data-theme="classic|modern-light|modern-dark"
+   sul tag <html>. Default: classic (variabili già in :root).
+   ═══════════════════════════════════════════════════════════════════════════ */
+
+/* ── MODERNO SCURO ────────────────────────────────────────────────────────── */
+[data-theme="modern-dark"] {
+  --bg:      #111014;
+  --bg2:     #1c1b20;
+  --bg3:     #27262d;
+  --border:  rgba(255,255,255,0.07);
+  --border2: rgba(255,255,255,0.14);
+  --text:    #f0ecf8;
+  --text2:   #9993a8;
+  --text3:   #524f5e;
+  --p1:      #6ab0ff;
+  --p1bg:    rgba(106,176,255,0.12);
+  --p1border:rgba(106,176,255,0.35);
+  --p2:      #ff7c5c;
+  --p2bg:    rgba(255,124,92,0.12);
+  --p2border:rgba(255,124,92,0.35);
+  --gold:    #f0b030;
+  --goldbg:  rgba(240,176,48,0.15);
+  --radius:  10px;
+  --radius-lg:14px;
+}
+
+/* ── MODERNO CHIARO ───────────────────────────────────────────────────────── */
+[data-theme="modern-light"] {
+  --bg:      #f0ece6;
+  --bg2:     #ffffff;
+  --bg3:     #e8e3dc;
+  --border:  rgba(0,0,0,0.10);
+  --border2: rgba(0,0,0,0.18);
+  --text:    #1a1714;
+  --text2:   #6b6560;
+  --text3:   #a09890;
+  --p1:      #1a6fc4;
+  --p1bg:    rgba(26,111,196,0.10);
+  --p1border:rgba(26,111,196,0.35);
+  --p2:      #c43a1a;
+  --p2bg:    rgba(196,58,26,0.10);
+  --p2border:rgba(196,58,26,0.35);
+  --gold:    #b07c10;
+  --goldbg:  rgba(176,124,16,0.12);
+  --radius:  10px;
+  --radius-lg:14px;
+}
+
+/* ── SFONDO BODY ────────────────────────────────────────────────────────────
+   Classico: già definito nel body in style.css (#0f0e0d).
+   Per i temi moderni sovrascriviamo il background del body con texture/gradiente. */
+
+[data-theme="modern-light"] body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 20% 10%, rgba(220,210,200,0.6) 0%, transparent 60%),
+    radial-gradient(ellipse at 80% 90%, rgba(200,195,188,0.4) 0%, transparent 55%);
+}
+
+[data-theme="modern-dark"] body {
+  background: var(--bg);
+  background-image:
+    radial-gradient(ellipse at 15% 15%, rgba(80,60,120,0.18) 0%, transparent 55%),
+    radial-gradient(ellipse at 85% 85%, rgba(40,30,70,0.22) 0%, transparent 50%);
+}
+
+/* ── SCOREBOARD MODERNO ─────────────────────────────────────────────────────
+   Nelle versioni moderne il score-card è orizzontale con avatar a sinistra.  */
+
+[data-theme="modern-light"] .score-card,
+[data-theme="modern-dark"]  .score-card {
+  flex-direction: row;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+}
+
+[data-theme="modern-light"] .score-card.p2,
+[data-theme="modern-dark"]  .score-card.p2 {
+  flex-direction: row-reverse;
+}
+
+/* Avatar silhouette */
+[data-theme="modern-light"] .sc-avatar,
+[data-theme="modern-dark"]  .sc-avatar {
+  display: flex;
+}
+
+/* Testo score: colonna con nome sopra e punteggio sotto */
+[data-theme="modern-light"] .sc-text,
+[data-theme="modern-dark"]  .sc-text {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+[data-theme="modern-light"] .score-card.p2 .sc-text,
+[data-theme="modern-dark"]  .score-card.p2 .sc-text {
+  align-items: flex-end;
+}
+
+[data-theme="modern-light"] .sc-label,
+[data-theme="modern-dark"]  .sc-label {
+  font-size: 14px;
+  font-weight: bold;
+  letter-spacing: 0.02em;
+}
+
+[data-theme="modern-light"] .sc-pts,
+[data-theme="modern-dark"]  .sc-pts {
+  font-size: 42px;
+  line-height: 1;
+}
+
+/* Nascondi barra progresso nei temi moderni */
+[data-theme="modern-light"] .sc-bar,
+[data-theme="modern-dark"]  .sc-bar {
+  display: none;
+}
+
+/* ── SCORE-CARD ACTIVE ──────────────────────────────────────────────────────*/
+[data-theme="modern-light"] .score-card.active.p1 {
+  border-color: var(--p1);
+  background: linear-gradient(135deg, rgba(26,111,196,0.12) 0%, var(--bg2) 60%);
+  box-shadow: 0 2px 16px rgba(26,111,196,0.15);
+}
+[data-theme="modern-light"] .score-card.active.p2 {
+  border-color: var(--p2);
+  background: linear-gradient(135deg, var(--bg2) 40%, rgba(196,58,26,0.12) 100%);
+  box-shadow: 0 2px 16px rgba(196,58,26,0.15);
+}
+[data-theme="modern-dark"] .score-card.active.p1 {
+  border-color: var(--p1);
+  background: rgba(106,176,255,0.10);
+  box-shadow: 0 2px 20px rgba(106,176,255,0.18);
+}
+[data-theme="modern-dark"] .score-card.active.p2 {
+  border-color: var(--p2);
+  background: rgba(255,124,92,0.10);
+  box-shadow: 0 2px 20px rgba(255,124,92,0.18);
+}
+
+/* ── AVATAR SILHOUETTE ──────────────────────────────────────────────────────*/
+.sc-avatar {
+  display: none; /* nascosto nel tema classico */
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: var(--bg3);
+  border: 1px solid var(--border2);
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.sc-avatar svg {
+  width: 28px;
+  height: 28px;
+  opacity: 0.5;
+}
+.sc-avatar img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* ── BASKET CARDS MODERNO ───────────────────────────────────────────────────*/
+[data-theme="modern-light"] .bcard {
+  box-shadow: 0 1px 4px rgba(0,0,0,0.10);
+}
+[data-theme="modern-light"] .bcard:hover {
+  box-shadow: 0 3px 10px rgba(0,0,0,0.16);
+}
+[data-theme="modern-dark"] .bcard {
+  box-shadow: 0 1px 6px rgba(0,0,0,0.4);
+}
+[data-theme="modern-dark"] .bcard:hover {
+  box-shadow: 0 3px 14px rgba(0,0,0,0.55);
+}
+
+/* ── BASKET CARD TIER GRADIENTS ─────────────────────────────────────────────*/
+[data-theme="modern-light"] .bcard.tier-l {
+  background: linear-gradient(160deg, rgba(180,130,10,0.18) 0%, #fff 55%);
+  border-color: rgba(180,130,10,0.55);
+}
+[data-theme="modern-light"] .bcard.tier-e {
+  background: linear-gradient(160deg, rgba(130,60,200,0.14) 0%, #fff 55%);
+  border-color: rgba(130,60,200,0.45);
+}
+[data-theme="modern-light"] .bcard.tier-r {
+  background: linear-gradient(160deg, rgba(26,111,196,0.12) 0%, #fff 55%);
+  border-color: rgba(26,111,196,0.4);
+}
+[data-theme="modern-light"] .bcard.tier-c {
+  background: #fff;
+  border-color: rgba(0,0,0,0.12);
+}
+[data-theme="modern-light"] .bcard.tier-l .bc-name { color: #8a6000; }
+[data-theme="modern-light"] .bcard.tier-e .bc-name { color: #7030b0; }
+[data-theme="modern-light"] .bcard.tier-r .bc-name { color: var(--p1); }
+[data-theme="modern-light"] .bcard.tier-c .bc-name { color: var(--text); }
+
+[data-theme="modern-light"] .bcv {
+  background: var(--bg3);
+  color: var(--text);
+}
+
+[data-theme="modern-dark"] .bcard.tier-l {
+  background: linear-gradient(160deg, rgba(240,176,48,0.18) 0%, var(--bg2) 60%);
+  border-color: rgba(240,176,48,0.55);
+}
+[data-theme="modern-dark"] .bcard.tier-e {
+  background: linear-gradient(160deg, rgba(160,80,255,0.18) 0%, var(--bg2) 60%);
+  border-color: rgba(160,80,255,0.5);
+}
+[data-theme="modern-dark"] .bcard.tier-r {
+  background: linear-gradient(160deg, rgba(106,176,255,0.14) 0%, var(--bg2) 60%);
+  border-color: rgba(106,176,255,0.45);
+}
+
+/* ── CELLE CAMPO MODERNO ────────────────────────────────────────────────────*/
+[data-theme="modern-light"] .cell.zone-castello {
+  background: rgba(26,111,196,0.08);
+  border-color: rgba(26,111,196,0.3);
+}
+[data-theme="modern-light"] .cell.zone-re {
+  background: rgba(176,124,16,0.10);
+  border-color: rgba(176,124,16,0.4);
+}
+[data-theme="modern-light"] .cell.zone-villaggio {
+  background: rgba(40,130,60,0.08);
+  border-color: rgba(40,130,60,0.3);
+}
+[data-theme="modern-light"] .zone-lbl { text-shadow: none; }
+[data-theme="modern-light"] .cell-num { color: var(--text3); }
+[data-theme="modern-light"] .lane-empty { color: var(--text3); }
+[data-theme="modern-light"] .pc-info { background: rgba(0,0,0,0.45); }
+
+[data-theme="modern-dark"] .cell.zone-castello {
+  background: rgba(70,130,220,0.10);
+  border-color: rgba(70,130,220,0.30);
+}
+[data-theme="modern-dark"] .cell.zone-re {
+  background: rgba(200,150,30,0.12);
+  border-color: rgba(200,150,30,0.38);
+}
+[data-theme="modern-dark"] .cell.zone-villaggio {
+  background: rgba(50,160,80,0.10);
+  border-color: rgba(50,160,80,0.28);
+}
+
+/* ── TURN BANNER & PHASE SLOTS MODERNO ──────────────────────────────────────*/
+[data-theme="modern-light"] .turn-banner {
+  background: var(--bg2);
+  border-color: var(--border2);
+  color: var(--text);
+}
+[data-theme="modern-light"] .phase-slot {
+  background: var(--bg2);
+  border-color: var(--border2);
+}
+
+/* ── OVERLAY & BUTTONS MODERNO ───────────────────────────────────────────────*/
+[data-theme="modern-light"] .btn {
+  color: var(--text);
+}
+[data-theme="modern-light"] .btn-insert {
+  background: var(--gold);
+  color: #fff;
+}
+[data-theme="modern-light"] .btn-insert:disabled {
+  background: var(--bg3);
+  color: var(--text3);
+}
+
+/* ── THEME SWITCHER WIDGET (in lobby) ───────────────────────────────────────*/
+.theme-switcher-card {
+  background: var(--bg3);
+  border-radius: var(--radius);
+  padding: 10px 12px 6px;
+  text-align: center;
+  border: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  min-width: 80px;
+}
+.theme-switcher-btns {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.theme-switcher-lbl {
+  font-size: 11px;
+  color: var(--text3);
+  font-family: 'BurbankBig', sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.theme-btn {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.15s;
+  flex-shrink: 0;
+}
+.theme-btn:hover { transform: scale(1.18); }
+.theme-btn.active { border-color: var(--gold); }
+.theme-btn[data-theme-id="classic"]      { background: #1a1917; box-shadow: inset 0 0 0 3px #e8a020; }
+.theme-btn[data-theme-id="modern-dark"]  { background: linear-gradient(135deg, #1c1b20 50%, #6ab0ff 50%); }
+.theme-btn[data-theme-id="modern-light"] { background: linear-gradient(135deg, #f0ece6 50%, #1a6fc4 50%); }
+
