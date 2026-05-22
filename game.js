@@ -8,46 +8,46 @@ export const ZONE_NAMES = ['Castello', 'Re', 'Villaggio'];
 
 // ─── ILLUSTRAZIONI BORGES ────────────────────────────────────────────────────
 const PIECE_IMG = {
-  "Spalacacca": "img/1000/spalacacca.png",
-  "Sentinella Sicula": "img/1000/sentinella_sicula.png",
-  "U Porco": "img/1000/u_porco.png",
-  "Jullare": "img/1000/jullare.png",
-  "L'impiccato": "img/1000/l_impiccato.png",
-  "Scavafossati": "img/1000/scavafossati.png",
-  "Genuflesso": "img/1000/genuflesso.png",
-  "Imboscato": "img/1000/imboscato.png",
-  "Srotolatappeti": "img/1000/srotolatappeti.png",
-  "Illetterato": "img/1000/il_letterato.png",
-  "Accenditorce": "img/1000/accenditorce.png",
-  "Mangiapane": "img/1000/mangiapane.png",
-  "Catapulta Umana": "img/1000/catapulta_umana.png",
-  "Lebbroso": "img/1000/lebbroso.png",
-  "Calpestato": "img/1000/calpestato.png",
-  "Raccoglifrecce": "img/1000/raccoglifrecce.png",
-  "Gattara": "img/1000/gattara.png",
-  "Esattore": "img/1000/esattore.png",
-  "Reggitrono": "img/1000/reggitrono.png",
-  "Sventolatore": "img/1000/sventolatore.png",
-  "Ratto di Fogna": "img/1000/ratto_di_fogna.png",
-  "Spaventapasseri": "img/1000/spaventapasseri.png",
-  "Bevipozioni": "img/1000/bevipozioni.png",
-  "Portaspade": "img/1000/portaspade.png",
-  "Suonacampane": "img/1000/suonacampane.png",
-  "Alzaponte": "img/1000/alzaponte.png",
-  "Fagiano di corte": "img/1000/fagiano_di_corte.png",
-  "Vendistracci": "img/1000/vendistracci.png",
-  "Guaritore Cieco": "img/1000/guaritore_cieco.png",
-  "Boia Tagliateste": "img/1000/boia_tagliateste.png",
-  "Cellaio": "img/1000/cellaio.png",
-  "Arciere gobbo": "img/1000/arciere_gobbo.png",
-  "Spadaccino monco": "img/1000/spadaccino_monco.png",
-  "Frate Ubriaco": "img/1000/frate_ubriaco.png",
-  "Monaco Obeso": "img/1000/monaco_obeso.png",
-  "Apparecchiatavoli": "img/1000/apparecchiatavoli.png",
-  "Mangiapeccati": "img/1000/mangiapeccati.png",
-  "Seppellianimali": "img/1000/seppellianimali.png",
-  "Usuraio": "img/1000/usuraio.png",
-  "Portaneve": "img/1000/portaneve.png",
+  "Spalacacca": "spalacacca.png",
+  "Sentinella Sicula": "sentinella_sicula.png",
+  "U Porco": "u_porco.png",
+  "Jullare": "jullare.png",
+  "L'impiccato": "l_impiccato.png",
+  "Scavafossati": "scavafossati.png",
+  "Genuflesso": "genuflesso.png",
+  "Imboscato": "imboscato.png",
+  "Srotolatappeti": "srotolatappeti.png",
+  "Illetterato": "il_letterato.png",
+  "Accenditorce": "accenditorce.png",
+  "Mangiapane": "mangiapane.png",
+  "Catapulta Umana": "catapulta_umana.png",
+  "Lebbroso": "lebbroso.png",
+  "Calpestato": "calpestato.png",
+  "Raccoglifrecce": "raccoglifrecce.png",
+  "Gattara": "gattara.png",
+  "Esattore": "esattore.png",
+  "Reggitrono": "reggitrono.png",
+  "Sventolatore": "sventolatore.png",
+  "Ratto di Fogna": "ratto_di_fogna.png",
+  "Spaventapasseri": "spaventapasseri.png",
+  "Bevipozioni": "bevipozioni.png",
+  "Portaspade": "portaspade.png",
+  "Suonacampane": "suonacampane.png",
+  "Alzaponte": "alzaponte.png",
+  "Fagiano di corte": "fagiano_di_corte.png",
+  "Vendistracci": "vendistracci.png",
+  "Guaritore Cieco": "guaritore_cieco.png",
+  "Boia Tagliateste": "boia_tagliateste.png",
+  "Cellaio": "cellaio.png",
+  "Arciere gobbo": "arciere_gobbo.png",
+  "Spadaccino monco": "spadaccino_monco.png",
+  "Frate Ubriaco": "frate_ubriaco.png",
+  "Monaco Obeso": "monaco_obeso.png",
+  "Apparecchiatavoli": "apparecchiatavoli.png",
+  "Mangiapeccati": "mangiapeccati.png",
+  "Seppellianimali": "seppellianimali.png",
+  "Usuraio": "usuraio.png",
+  "Portaneve": "portaneve.png",
 };
 
 let _deckFolder = 'img/1000';
@@ -57,11 +57,11 @@ export function setPieceDeckFolder(folder) {
 }
 
 function getPieceImg(name) {
-  // Usa il folder del mazzo attivo; fallback a img/1000
-  const base = PIECE_IMG[name] || '';
-  if (!base) return '';
-  // Sostituisce il prefisso img/ con il folder del mazzo
-  return base.replace(/^img\//, _deckFolder + '/');
+  // PIECE_IMG contiene solo il filename (es. "spalacacca.png")
+  // _deckFolder contiene il folder del mazzo attivo (es. "img/1000")
+  const filename = PIECE_IMG[name] || '';
+  if (!filename) return '';
+  return _deckFolder + '/' + filename;
 }
 
 export const ALL_PIECES = [

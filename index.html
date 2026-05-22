@@ -959,7 +959,7 @@ function renderDecksTab() {
     else if (!isOwned) cls += ' locked-deck';
     var statusLabel = isActive ? 'IN USO' : (isOwned ? 'DISPONIBILE' : 'ELO ' + def.minElo);
     var statusCls   = isActive ? 'status-active' : (isOwned ? 'status-owned' : 'status-locked');
-    html += '<div class="' + cls + '" onclick="window.selectDeck('' + def.id + '')">';
+    html += '<div class="' + cls + '" onclick="window.selectDeck(\'' + def.id + '\')">';
     html += '<div class="deck-icon">' + def.icon + '</div>';
     html += '<div class="deck-info"><div class="deck-label">' + def.label + '</div><div class="deck-desc">' + def.desc + '</div></div>';
     html += '<div class="deck-status ' + statusCls + '">' + statusLabel + '</div>';
