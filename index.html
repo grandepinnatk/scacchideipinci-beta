@@ -453,6 +453,138 @@
 .deck-status.status-active  { background: var(--goldbg); color: var(--gold); border: 1px solid var(--gold); }
 .deck-status.status-owned   { background: rgba(93,202,138,0.15); color: #5dca8a; border: 1px solid #5dca8a; }
 .deck-status.status-locked  { background: var(--bg2); color: var(--text3); border: 1px solid var(--border); }
+.preview-pill {
+  padding: 4px 10px;
+  border-radius: 5px;
+  border: 1px solid var(--border2);
+  background: var(--bg2);
+  color: var(--text2);
+  font-family: 'BurbankBig', sans-serif;
+  font-size: 11px;
+  cursor: pointer;
+  transition: border-color 0.15s, color 0.15s;
+  flex-shrink: 0;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+}
+.preview-pill:hover { border-color: var(--gold); color: var(--text); }
+
+/* ── DECK PREVIEW ──────────────────────────────────────────────────────── */
+.deck-preview-back {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: none;
+  border: none;
+  color: var(--text2);
+  font-family: 'BurbankBig', sans-serif;
+  font-size: 13px;
+  cursor: pointer;
+  padding: 0 0 14px 0;
+  transition: color 0.15s;
+  letter-spacing: 0.04em;
+}
+.deck-preview-back:hover { color: var(--text); }
+
+.deck-preview-title {
+  font-size: 16px;
+  font-family: 'BurbankBig', sans-serif;
+  color: var(--text);
+  margin-bottom: 14px;
+}
+
+.preview-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+  gap: 8px;
+}
+.preview-thumb {
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: border-color 0.15s, transform 0.1s;
+  background: var(--bg3);
+  aspect-ratio: 1 / 1;
+}
+.preview-thumb:hover { border-color: var(--gold); transform: scale(1.04); }
+.preview-thumb img {
+  width: 100%; height: 100%;
+  object-fit: cover; display: block;
+}
+
+/* Lightbox singola immagine */
+.preview-lightbox {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 16px;
+}
+.preview-lightbox-inner {
+  position: relative;
+  max-width: 460px;
+  width: 100%;
+  background: var(--bg2);
+  border: 1px solid var(--border2);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+.preview-lightbox-img {
+  width: 100%;
+  aspect-ratio: 1/1;
+  object-fit: cover;
+  display: block;
+}
+.preview-lightbox-name {
+  padding: 10px 14px;
+  font-family: 'BurbankBig', sans-serif;
+  font-size: 16px;
+  color: var(--text);
+  text-align: center;
+  border-top: 1px solid var(--border);
+}
+.preview-lightbox-nav {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-top: 14px;
+}
+.preview-nav-btn {
+  width: 42px; height: 42px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  background: var(--bg2);
+  color: var(--text);
+  font-size: 20px;
+  cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: background 0.15s, border-color 0.15s;
+}
+.preview-nav-btn:hover { background: var(--bg3); border-color: var(--gold); }
+.preview-nav-counter {
+  font-family: 'BurbankBig', monospace;
+  font-size: 13px;
+  color: var(--text2);
+  min-width: 50px;
+  text-align: center;
+}
+.preview-lightbox-close {
+  position: absolute;
+  top: 8px; right: 10px;
+  background: rgba(0,0,0,0.55);
+  border: none;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  padding: 3px 8px;
+  line-height: 1;
+}
 </style>
 
 <!-- SCREEN: LOGIN -->
@@ -959,10 +1091,15 @@ function renderDecksTab() {
     else if (!isOwned) cls += ' locked-deck';
     var statusLabel = isActive ? 'IN USO' : (isOwned ? 'DISPONIBILE' : 'ELO ' + def.minElo);
     var statusCls   = isActive ? 'status-active' : (isOwned ? 'status-owned' : 'status-locked');
-    html += '<div class="' + cls + '" onclick="window.selectDeck(\'' + def.id + '\')">';
+    html += '<div class="' + cls + '">';
     html += '<div class="deck-icon">' + def.icon + '</div>';
     html += '<div class="deck-info"><div class="deck-label">' + def.label + '</div><div class="deck-desc">' + def.desc + '</div></div>';
-    html += '<div class="deck-status ' + statusCls + '">' + statusLabel + '</div>';
+    html += '<button class="preview-pill" onclick="event.stopPropagation();window.openDeckPreview(\'' + def.id + '\')" title="Anteprima illustrazioni">👁 Preview</button>';
+    if (isOwned) {
+      html += '<div class="deck-status ' + statusCls + '" style="cursor:pointer" onclick="window.selectDeck(\'' + def.id + '\')">' + statusLabel + '</div>';
+    } else {
+      html += '<div class="deck-status ' + statusCls + '">' + statusLabel + '</div>';
+    }
     html += '</div>';
   });
   html += '</div>';
@@ -981,6 +1118,93 @@ window.selectDeck = function(deckId) {
 document.addEventListener('click', function(e) {
   var overlay = document.getElementById('rewards-overlay');
   if (overlay && e.target === overlay) window.closeRewards();
+});
+</script>
+
+<script>
+// ─── DECK PREVIEW ───────────────────────────────────────────────────────────
+var _PIECE_NAMES = [\'Spalacacca\', \'Sentinella Sicula\', \'U Porco\', \'Jullare\', "L\'impiccato", \'Scavafossati\', \'Genuflesso\', \'Imboscato\', \'Srotolatappeti\', \'Illetterato\', \'Accenditorce\', \'Mangiapane\', \'Catapulta Umana\', \'Lebbroso\', \'Calpestato\', \'Raccoglifrecce\', \'Gattara\', \'Esattore\', \'Reggitrono\', \'Sventolatore\', \'Ratto di Fogna\', \'Spaventapasseri\', \'Bevipozioni\', \'Portaspade\', \'Suonacampane\', \'Alzaponte\', \'Fagiano di corte\', \'Vendistracci\', \'Guaritore Cieco\', \'Boia Tagliateste\', \'Cellaio\', \'Arciere gobbo\', \'Spadaccino monco\', \'Frate Ubriaco\', \'Monaco Obeso\', \'Apparecchiatavoli\', \'Mangiapeccati\', \'Seppellianimali\', \'Usuraio\', \'Portaneve\'];
+var _PIECE_FILES = ['spalacacca.png', 'sentinella_sicula.png', 'u_porco.png', 'jullare.png', 'l_impiccato.png', 'scavafossati.png', 'genuflesso.png', 'imboscato.png', 'srotolatappeti.png', 'il_letterato.png', 'accenditorce.png', 'mangiapane.png', 'catapulta_umana.png', 'lebbroso.png', 'calpestato.png', 'raccoglifrecce.png', 'gattara.png', 'esattore.png', 'reggitrono.png', 'sventolatore.png', 'ratto_di_fogna.png', 'spaventapasseri.png', 'bevipozioni.png', 'portaspade.png', 'suonacampane.png', 'alzaponte.png', 'fagiano_di_corte.png', 'vendistracci.png', 'guaritore_cieco.png', 'boia_tagliateste.png', 'cellaio.png', 'arciere_gobbo.png', 'spadaccino_monco.png', 'frate_ubriaco.png', 'monaco_obeso.png', 'apparecchiatavoli.png', 'mangiapeccati.png', 'seppellianimali.png', 'usuraio.png', 'portaneve.png'];
+var _lightboxIdx  = 0;
+var _lightboxDeck = 'img/1000';
+
+window.openDeckPreview = function(deckId) {
+  var r = window._rewards;
+  var folder = 'img/1000';
+  if (r) {
+    var def = r.DECK_DEFS.find(function(d){ return d.id === deckId; });
+    if (def) folder = def.folder;
+  }
+  _lightboxDeck = folder;
+
+  var body = document.getElementById('rewards-body');
+  var html  = '<button class="deck-preview-back" onclick="window.switchRewardsTab(\'decks\')">← Torna ai mazzi</button>';
+  html += '<div class="deck-preview-title">Anteprima mazzo</div>';
+  html += '<div class="preview-grid">';
+  for (var i = 0; i < _PIECE_NAMES.length; i++) {
+    html += '<div class="preview-thumb" onclick="window.openLightbox(' + i + ')">';
+    html += '<img src="' + folder + '/' + _PIECE_FILES[i] + '" alt="' + _PIECE_NAMES[i] + '" loading="lazy">';
+    html += '</div>';
+  }
+  html += '</div>';
+  body.innerHTML = html;
+};
+
+window.openLightbox = function(idx) {
+  _lightboxIdx = idx;
+  _renderLightbox();
+  var lb = document.getElementById('preview-lightbox');
+  if (!lb) {
+    lb = document.createElement('div');
+    lb.id = 'preview-lightbox';
+    lb.className = 'preview-lightbox';
+    document.body.appendChild(lb);
+  }
+  lb.style.display = 'flex';
+  _renderLightbox();
+};
+
+function _renderLightbox() {
+  var lb = document.getElementById('preview-lightbox');
+  if (!lb) return;
+  var name = _PIECE_NAMES[_lightboxIdx];
+  var file = _PIECE_FILES[_lightboxIdx];
+  lb.innerHTML =
+    '<div class="preview-lightbox-inner">' +
+      '<button class="preview-lightbox-close" onclick="window.closeLightbox()">✕</button>' +
+      '<img class="preview-lightbox-img" src="' + _lightboxDeck + '/' + file + '" alt="' + name + '">' +
+      '<div class="preview-lightbox-name">' + name + '</div>' +
+    '</div>' +
+    '<div class="preview-lightbox-nav">' +
+      '<button class="preview-nav-btn" onclick="window.lightboxNav(-1)">&#8592;</button>' +
+      '<span class="preview-nav-counter">' + (_lightboxIdx + 1) + ' / ' + _PIECE_NAMES.length + '</span>' +
+      '<button class="preview-nav-btn" onclick="window.lightboxNav(1)">&#8594;</button>' +
+    '</div>';
+};
+
+window.lightboxNav = function(dir) {
+  _lightboxIdx = (_lightboxIdx + dir + _PIECE_NAMES.length) % _PIECE_NAMES.length;
+  _renderLightbox();
+};
+
+window.closeLightbox = function() {
+  var lb = document.getElementById('preview-lightbox');
+  if (lb) lb.style.display = 'none';
+};
+
+// Tasti freccia + ESC per lightbox
+document.addEventListener('keydown', function(e) {
+  var lb = document.getElementById('preview-lightbox');
+  if (!lb || lb.style.display === 'none') return;
+  if (e.key === 'ArrowRight') window.lightboxNav(1);
+  if (e.key === 'ArrowLeft')  window.lightboxNav(-1);
+  if (e.key === 'Escape')     window.closeLightbox();
+});
+
+// Click fuori dall'immagine chiude lightbox
+document.addEventListener('click', function(e) {
+  var lb = document.getElementById('preview-lightbox');
+  if (lb && e.target === lb) window.closeLightbox();
 });
 </script>
 </body>

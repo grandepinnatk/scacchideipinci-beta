@@ -135,10 +135,29 @@ export async function initRewards() {
   const d = snap.val();
 
   _userRewards.badges     = d.badges     || {};
-  _userRewards.ownedDecks = d.ownedDecks || ['classic'];
   _userRewards.activeDeck = d.activeDeck || 'classic';
   _userRewards.streak     = d.streak     || 0;
   _userRewards.totalWins  = d.wins       || 0;
+
+  // Sblocca retroattivamente i mazzi in base all'ELO attuale
+  // (gestisce i giocatori che hanno raggiunto la soglia prima del deploy del sistema premi)
+  const currentElo  = d.elo || 1000;
+  const savedDecks  = d.ownedDecks || ['classic'];
+  const ownedDecks  = [...savedDecks];
+  let   deckUpdated = false;
+
+  for (const deck of DECK_DEFS) {
+    if (!deck.alwaysOwned && !ownedDecks.includes(deck.id) && currentElo >= deck.minElo) {
+      ownedDecks.push(deck.id);
+      deckUpdated = true;
+    }
+  }
+
+  if (deckUpdated) {
+    await update(ref(db, `users/${user.uid}`), { ownedDecks });
+  }
+
+  _userRewards.ownedDecks = ownedDecks;
 
   // Aggiorna UI notifica
   _updateBadgeNotification();
