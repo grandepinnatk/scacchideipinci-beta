@@ -1121,66 +1121,84 @@ document.addEventListener('click', function(e) {
 });
 </script>
 
+
 <script>
 // ─── DECK PREVIEW ───────────────────────────────────────────────────────────
-var _PIECE_NAMES = [\'Spalacacca\', \'Sentinella Sicula\', \'U Porco\', \'Jullare\', "L\'impiccato", \'Scavafossati\', \'Genuflesso\', \'Imboscato\', \'Srotolatappeti\', \'Illetterato\', \'Accenditorce\', \'Mangiapane\', \'Catapulta Umana\', \'Lebbroso\', \'Calpestato\', \'Raccoglifrecce\', \'Gattara\', \'Esattore\', \'Reggitrono\', \'Sventolatore\', \'Ratto di Fogna\', \'Spaventapasseri\', \'Bevipozioni\', \'Portaspade\', \'Suonacampane\', \'Alzaponte\', \'Fagiano di corte\', \'Vendistracci\', \'Guaritore Cieco\', \'Boia Tagliateste\', \'Cellaio\', \'Arciere gobbo\', \'Spadaccino monco\', \'Frate Ubriaco\', \'Monaco Obeso\', \'Apparecchiatavoli\', \'Mangiapeccati\', \'Seppellianimali\', \'Usuraio\', \'Portaneve\'];
-var _PIECE_FILES = ['spalacacca.png', 'sentinella_sicula.png', 'u_porco.png', 'jullare.png', 'l_impiccato.png', 'scavafossati.png', 'genuflesso.png', 'imboscato.png', 'srotolatappeti.png', 'il_letterato.png', 'accenditorce.png', 'mangiapane.png', 'catapulta_umana.png', 'lebbroso.png', 'calpestato.png', 'raccoglifrecce.png', 'gattara.png', 'esattore.png', 'reggitrono.png', 'sventolatore.png', 'ratto_di_fogna.png', 'spaventapasseri.png', 'bevipozioni.png', 'portaspade.png', 'suonacampane.png', 'alzaponte.png', 'fagiano_di_corte.png', 'vendistracci.png', 'guaritore_cieco.png', 'boia_tagliateste.png', 'cellaio.png', 'arciere_gobbo.png', 'spadaccino_monco.png', 'frate_ubriaco.png', 'monaco_obeso.png', 'apparecchiatavoli.png', 'mangiapeccati.png', 'seppellianimali.png', 'usuraio.png', 'portaneve.png'];
+var _PIECE_NAMES = [
+  "Spalacacca","Sentinella Sicula","U Porco","Jullare","L'impiccato",
+  "Scavafossati","Genuflesso","Imboscato","Srotolatappeti","Illetterato",
+  "Accenditorce","Mangiapane","Catapulta Umana","Lebbroso","Calpestato",
+  "Raccoglifrecce","Gattara","Esattore","Reggitrono","Sventolatore",
+  "Ratto di Fogna","Spaventapasseri","Bevipozioni","Portaspade","Suonacampane",
+  "Alzaponte","Fagiano di corte","Vendistracci","Guaritore Cieco","Boia Tagliateste",
+  "Cellaio","Arciere gobbo","Spadaccino monco","Frate Ubriaco","Monaco Obeso",
+  "Apparecchiatavoli","Mangiapeccati","Seppellianimali","Usuraio","Portaneve"
+];
+var _PIECE_FILES = [
+  "spalacacca.png","sentinella_sicula.png","u_porco.png","jullare.png","l_impiccato.png",
+  "scavafossati.png","genuflesso.png","imboscato.png","srotolatappeti.png","il_letterato.png",
+  "accenditorce.png","mangiapane.png","catapulta_umana.png","lebbroso.png","calpestato.png",
+  "raccoglifrecce.png","gattara.png","esattore.png","reggitrono.png","sventolatore.png",
+  "ratto_di_fogna.png","spaventapasseri.png","bevipozioni.png","portaspade.png","suonacampane.png",
+  "alzaponte.png","fagiano_di_corte.png","vendistracci.png","guaritore_cieco.png","boia_tagliateste.png",
+  "cellaio.png","arciere_gobbo.png","spadaccino_monco.png","frate_ubriaco.png","monaco_obeso.png",
+  "apparecchiatavoli.png","mangiapeccati.png","seppellianimali.png","usuraio.png","portaneve.png"
+];
 var _lightboxIdx  = 0;
-var _lightboxDeck = 'img/1000';
+var _lightboxDeck = "img/1000";
 
 window.openDeckPreview = function(deckId) {
   var r = window._rewards;
-  var folder = 'img/1000';
+  var folder = "img/1000";
   if (r) {
-    var def = r.DECK_DEFS.find(function(d){ return d.id === deckId; });
+    var def = r.DECK_DEFS.find(function(d) { return d.id === deckId; });
     if (def) folder = def.folder;
   }
   _lightboxDeck = folder;
 
-  var body = document.getElementById('rewards-body');
-  var html  = '<button class="deck-preview-back" onclick="window.switchRewardsTab(\'decks\')">← Torna ai mazzi</button>';
-  html += '<div class="deck-preview-title">Anteprima mazzo</div>';
-  html += '<div class="preview-grid">';
+  var body = document.getElementById("rewards-body");
+  var html = "<button class=\"deck-preview-back\" onclick=\"window.switchRewardsTab('decks')\">&#8592; Torna ai mazzi</button>";
+  html += "<div class=\"deck-preview-title\">Anteprima mazzo</div>";
+  html += "<div class=\"preview-grid\">";
   for (var i = 0; i < _PIECE_NAMES.length; i++) {
-    html += '<div class="preview-thumb" onclick="window.openLightbox(' + i + ')">';
-    html += '<img src="' + folder + '/' + _PIECE_FILES[i] + '" alt="' + _PIECE_NAMES[i] + '" loading="lazy">';
-    html += '</div>';
+    html += "<div class=\"preview-thumb\" onclick=\"window.openLightbox(" + i + ")\">";
+    html += "<img src=\"" + folder + "/" + _PIECE_FILES[i] + "\" alt=\"" + _PIECE_NAMES[i] + "\" loading=\"lazy\">";
+    html += "</div>";
   }
-  html += '</div>';
+  html += "</div>";
   body.innerHTML = html;
 };
 
 window.openLightbox = function(idx) {
   _lightboxIdx = idx;
-  _renderLightbox();
-  var lb = document.getElementById('preview-lightbox');
+  var lb = document.getElementById("preview-lightbox");
   if (!lb) {
-    lb = document.createElement('div');
-    lb.id = 'preview-lightbox';
-    lb.className = 'preview-lightbox';
+    lb = document.createElement("div");
+    lb.id = "preview-lightbox";
+    lb.className = "preview-lightbox";
     document.body.appendChild(lb);
   }
-  lb.style.display = 'flex';
+  lb.style.display = "flex";
   _renderLightbox();
 };
 
 function _renderLightbox() {
-  var lb = document.getElementById('preview-lightbox');
+  var lb = document.getElementById("preview-lightbox");
   if (!lb) return;
   var name = _PIECE_NAMES[_lightboxIdx];
   var file = _PIECE_FILES[_lightboxIdx];
   lb.innerHTML =
-    '<div class="preview-lightbox-inner">' +
-      '<button class="preview-lightbox-close" onclick="window.closeLightbox()">✕</button>' +
-      '<img class="preview-lightbox-img" src="' + _lightboxDeck + '/' + file + '" alt="' + name + '">' +
-      '<div class="preview-lightbox-name">' + name + '</div>' +
-    '</div>' +
-    '<div class="preview-lightbox-nav">' +
-      '<button class="preview-nav-btn" onclick="window.lightboxNav(-1)">&#8592;</button>' +
-      '<span class="preview-nav-counter">' + (_lightboxIdx + 1) + ' / ' + _PIECE_NAMES.length + '</span>' +
-      '<button class="preview-nav-btn" onclick="window.lightboxNav(1)">&#8594;</button>' +
-    '</div>';
-};
+    "<div class=\"preview-lightbox-inner\">" +
+      "<button class=\"preview-lightbox-close\" onclick=\"window.closeLightbox()\">&#x2715;</button>" +
+      "<img class=\"preview-lightbox-img\" src=\"" + _lightboxDeck + "/" + file + "\" alt=\"" + name + "\">" +
+      "<div class=\"preview-lightbox-name\">" + name + "</div>" +
+    "</div>" +
+    "<div class=\"preview-lightbox-nav\">" +
+      "<button class=\"preview-nav-btn\" onclick=\"window.lightboxNav(-1)\">&#8592;</button>" +
+      "<span class=\"preview-nav-counter\">" + (_lightboxIdx + 1) + " / " + _PIECE_NAMES.length + "</span>" +
+      "<button class=\"preview-nav-btn\" onclick=\"window.lightboxNav(1)\">&#8594;</button>" +
+    "</div>";
+}
 
 window.lightboxNav = function(dir) {
   _lightboxIdx = (_lightboxIdx + dir + _PIECE_NAMES.length) % _PIECE_NAMES.length;
@@ -1188,22 +1206,20 @@ window.lightboxNav = function(dir) {
 };
 
 window.closeLightbox = function() {
-  var lb = document.getElementById('preview-lightbox');
-  if (lb) lb.style.display = 'none';
+  var lb = document.getElementById("preview-lightbox");
+  if (lb) lb.style.display = "none";
 };
 
-// Tasti freccia + ESC per lightbox
-document.addEventListener('keydown', function(e) {
-  var lb = document.getElementById('preview-lightbox');
-  if (!lb || lb.style.display === 'none') return;
-  if (e.key === 'ArrowRight') window.lightboxNav(1);
-  if (e.key === 'ArrowLeft')  window.lightboxNav(-1);
-  if (e.key === 'Escape')     window.closeLightbox();
+document.addEventListener("keydown", function(e) {
+  var lb = document.getElementById("preview-lightbox");
+  if (!lb || lb.style.display === "none") return;
+  if (e.key === "ArrowRight") window.lightboxNav(1);
+  if (e.key === "ArrowLeft")  window.lightboxNav(-1);
+  if (e.key === "Escape")     window.closeLightbox();
 });
 
-// Click fuori dall'immagine chiude lightbox
-document.addEventListener('click', function(e) {
-  var lb = document.getElementById('preview-lightbox');
+document.addEventListener("click", function(e) {
+  var lb = document.getElementById("preview-lightbox");
   if (lb && e.target === lb) window.closeLightbox();
 });
 </script>
